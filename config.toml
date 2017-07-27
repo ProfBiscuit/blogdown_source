@@ -1,8 +1,8 @@
 baseurl = "https://ProfBiscuit.github.io/"
 relativeurls = true
 languageCode = "en-us"
-title = "A Hugo website"
-theme = "hugo-lithium-theme"
+title = "Website Under Construction"
+theme = "hugo-travelify-theme"
 googleAnalytics = ""
 disqusShortname = ""
 publishDir = "C:/Users/Matthew Buras/Documents/GitHub/ProfBiscuit.github.io"
@@ -16,13 +16,16 @@ ignoreFiles = ["\\.Rmd$", "_files$", "_cache$"]
     url = "/about/"
 [[menu.main]]
     name = "GitHub"
-    url = "https://github.com/rstudio/blogdown"
+    url = "https://github.com/ProfBiscuit"
 [[menu.main]]
     name = "Twitter"
-    url = "https://twitter.com/rstudio"
+    url = "https://twitter.com/mrbstat"
+[[menu.main]]
+    name = "LinkedIn"
+    url = "https://www.linkedin.com/in/matthew-r-buras/"
 
 [params]
-    description = "A website built through Hugo and blogdown."
+    description = "A website built through Hugo, blogdown, and hosted on for free on GitHub."
 
     # options for highlight.js (version, additional languages, and theme)
     highlightjsVersion = "9.11.0"
@@ -34,7 +37,7 @@ ignoreFiles = ["\\.Rmd$", "_files$", "_cache$"]
     MathJaxVersion = "2.7.1"
 
     [params.logo]
-    url = "logo.png"
+    url = "background2.jpeg"
     width = 50
     height = 50
     alt = "Logo"
