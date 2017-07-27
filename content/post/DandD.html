@@ -1,0 +1,295 @@
+---
+title: "D&D Probabilities for Determining Ability Scores"
+author: "Matthew R. Buras"
+date: "July 1, 2017"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+
+<div id="ability-scores" class="section level2">
+<h2>Ability Scores</h2>
+<p>If you like doing things randomly, like your ole buddy Biscuit here, then you’d rather not use the “15, 14, 13, 12, 10, 8” rule despite it’s convenience.</p>
+<p>To determine the ability scores “manually” you roll four six-sided dice and take the sum of the resulting values while ignoring the smallest valued roll.</p>
+<p>I know what you be thinking, what do those probabilities look like?</p>
+<p>I’m disappointed you asked. . .</p>
+<p>Anywho, it is really friggin’ annoying to map out the probabilities possible for four die rolls, even if they are only six-sided. As a result, I am going to estimate the probabilities using a simulation of 100,000 die rolls of four dice.</p>
+<p>For comparision sake, I will show the distribution of the probabilities if all four dice were used and if only the three highest valued were used.</p>
+</div>
+<div id="simulation-study" class="section level2">
+<h2>Simulation Study</h2>
+<pre class="r"><code># Biscuit
+# 07/01/2016
+# Some DandD calculation
+# Find working directory
+getwd()</code></pre>
+<pre><code>## [1] &quot;C:/Users/Matthew Buras/Documents/GitHub/blogdown_source/content/post&quot;</code></pre>
+<pre class="r"><code># Change working directory to desired location
+setwd(&quot;C:/Users/Matthew Buras/Documents/GitHub/blogdown_source/content/post&quot;)
+
+iter &lt;- 100000
+sum4 &lt;- rep(0, iter)
+sum3 &lt;- rep(0, iter)
+
+start.time &lt;- proc.time()
+for (i in 1:iter){
+set.seed(i)
+Roll &lt;- ceiling(runif(min = 0, max = 6, n = 4)) #Rolls four six-sided dice for each iteration
+sum4[i] &lt;- sum(Roll) #sums all four
+sum3[i] &lt;- sum(Roll)- min(Roll) #removes the smallest valued roll from the total sum
+}
+
+proc.time()-start.time #run time of the loop (in seconds)</code></pre>
+<pre><code>##    user  system elapsed 
+##    1.82    0.04    1.84</code></pre>
+<pre class="r"><code>#Look into the Tidyverse
+library(tidyverse) #require some packages to create histograms later</code></pre>
+<pre><code>## Loading tidyverse: ggplot2
+## Loading tidyverse: tibble
+## Loading tidyverse: tidyr
+## Loading tidyverse: readr
+## Loading tidyverse: purrr
+## Loading tidyverse: dplyr</code></pre>
+<pre><code>## Conflicts with tidy packages ----------------------------------------------</code></pre>
+<pre><code>## filter(): dplyr, stats
+## lag():    dplyr, stats</code></pre>
+<pre class="r"><code># Convert the vectors into dataframes so that we can make plots (YAY)
+dat3 &lt;- as.data.frame(sum3)
+dat4 &lt;- as.data.frame(sum4)</code></pre>
+</div>
+<div id="table-of-probabilities" class="section level2">
+<h2>Table of Probabilities</h2>
+<pre class="r"><code># Create probability tables for reference
+
+#   Probabilities for the sum of the three highest valued die rolls
+h3 &lt;- hist(sum3, breaks=(seq(2.5, 18.5, by=1)), plot = FALSE)
+h3probs &lt;- h3$counts/iter
+sums3 &lt;- seq(3, 18, by = 1)
+sum3table &lt;- as.data.frame(cbind(sums3, h3probs))
+names(sum3table) &lt;- c(&quot;Sum&quot;, &quot;Prob&quot;)
+
+library(knitr)
+kable(sum3table, caption = &quot;Probabilities for the sum of the three highest valued die rolls.&quot;)</code></pre>
+<table>
+<caption><span id="tab:unnamed-chunk-1">Table 1: </span>Probabilities for the sum of the three highest valued die rolls.</caption>
+<thead>
+<tr class="header">
+<th align="right">Sum</th>
+<th align="right">Prob</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">3</td>
+<td align="right">0.00077</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">0.00324</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="right">0.00773</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="right">0.01566</td>
+</tr>
+<tr class="odd">
+<td align="right">7</td>
+<td align="right">0.02937</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="right">0.04881</td>
+</tr>
+<tr class="odd">
+<td align="right">9</td>
+<td align="right">0.06983</td>
+</tr>
+<tr class="even">
+<td align="right">10</td>
+<td align="right">0.09436</td>
+</tr>
+<tr class="odd">
+<td align="right">11</td>
+<td align="right">0.11432</td>
+</tr>
+<tr class="even">
+<td align="right">12</td>
+<td align="right">0.12848</td>
+</tr>
+<tr class="odd">
+<td align="right">13</td>
+<td align="right">0.13264</td>
+</tr>
+<tr class="even">
+<td align="right">14</td>
+<td align="right">0.12405</td>
+</tr>
+<tr class="odd">
+<td align="right">15</td>
+<td align="right">0.10011</td>
+</tr>
+<tr class="even">
+<td align="right">16</td>
+<td align="right">0.07273</td>
+</tr>
+<tr class="odd">
+<td align="right">17</td>
+<td align="right">0.04150</td>
+</tr>
+<tr class="even">
+<td align="right">18</td>
+<td align="right">0.01640</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#   Probabilities for the sum of all four dice rolled
+h4 &lt;- hist(sum4, breaks=(seq(3.5, 24.5, by=1)), plot = FALSE)
+h4probs &lt;- h4$counts/iter
+sums4 &lt;- seq(4, 24, by = 1)
+sum4table &lt;- as.data.frame(cbind(sums4, h4probs))
+names(sum4table) &lt;- c(&quot;Sum&quot;, &quot;Prob&quot;)
+
+kable(sum4table, caption = &quot;Probabilities for the sum of all four dice rolled.&quot;)</code></pre>
+<table>
+<caption><span id="tab:unnamed-chunk-1">Table 1: </span>Probabilities for the sum of all four dice rolled.</caption>
+<thead>
+<tr class="header">
+<th align="right">Sum</th>
+<th align="right">Prob</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">4</td>
+<td align="right">0.00077</td>
+</tr>
+<tr class="even">
+<td align="right">5</td>
+<td align="right">0.00324</td>
+</tr>
+<tr class="odd">
+<td align="right">6</td>
+<td align="right">0.00773</td>
+</tr>
+<tr class="even">
+<td align="right">7</td>
+<td align="right">0.01482</td>
+</tr>
+<tr class="odd">
+<td align="right">8</td>
+<td align="right">0.02696</td>
+</tr>
+<tr class="even">
+<td align="right">9</td>
+<td align="right">0.04432</td>
+</tr>
+<tr class="odd">
+<td align="right">10</td>
+<td align="right">0.06128</td>
+</tr>
+<tr class="even">
+<td align="right">11</td>
+<td align="right">0.07997</td>
+</tr>
+<tr class="odd">
+<td align="right">12</td>
+<td align="right">0.09760</td>
+</tr>
+<tr class="even">
+<td align="right">13</td>
+<td align="right">0.10788</td>
+</tr>
+<tr class="odd">
+<td align="right">14</td>
+<td align="right">0.11257</td>
+</tr>
+<tr class="even">
+<td align="right">15</td>
+<td align="right">0.10747</td>
+</tr>
+<tr class="odd">
+<td align="right">16</td>
+<td align="right">0.09634</td>
+</tr>
+<tr class="even">
+<td align="right">17</td>
+<td align="right">0.08046</td>
+</tr>
+<tr class="odd">
+<td align="right">18</td>
+<td align="right">0.06101</td>
+</tr>
+<tr class="even">
+<td align="right">19</td>
+<td align="right">0.04245</td>
+</tr>
+<tr class="odd">
+<td align="right">20</td>
+<td align="right">0.02761</td>
+</tr>
+<tr class="even">
+<td align="right">21</td>
+<td align="right">0.01586</td>
+</tr>
+<tr class="odd">
+<td align="right">22</td>
+<td align="right">0.00776</td>
+</tr>
+<tr class="even">
+<td align="right">23</td>
+<td align="right">0.00321</td>
+</tr>
+<tr class="odd">
+<td align="right">24</td>
+<td align="right">0.00069</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="estimated-distributions" class="section level2">
+<h2>Estimated Distributions</h2>
+<p>Notice that summing only the three highest valued rolls skews the distribution of the probabilities.</p>
+<pre class="r"><code>q3 &lt;- ggplot(dat3, aes(x=sum3)) + geom_histogram(breaks=seq(3, 18, by=1), fill=&quot;blue&quot;, col=&quot;black&quot;,
+aes(y = ..count../sum(..count..)))
+q3 &lt;- q3 + ggtitle(&quot;Histogram for the Sum of the Three Largest of the Four Six Sided Dice&quot;) + labs(y = &quot;Probability&quot;, 
+x = &quot;Sum of the Three Largest Dice&quot;) + xlim(c(3, 18))
+q3</code></pre>
+<p><img src="/post/DandD_files/figure-html/pressure-1.png" width="672" /></p>
+<pre class="r"><code>q4 &lt;- ggplot(dat4, aes(x=sum4)) + geom_histogram(breaks=seq(4, 24, by=1), fill=&quot;blue&quot;, col=&quot;black&quot;,
+aes(y = ..count../sum(..count..)))
+q4 &lt;- q4 + ggtitle(&quot;Histogram for the Sum of Four Six Sided Dice&quot;) + labs(y = &quot;Probability&quot;, 
+x = &quot;Sum of the Four Dice&quot;) + xlim(c(4, 24))
+q4</code></pre>
+<p><img src="/post/DandD_files/figure-html/pressure-2.png" width="672" /></p>
+</div>
+<div id="how-you-too-can-do-fun-things-with-r-a-free-statistical-software" class="section level2">
+<h2>How You Too Can Do Fun Things with R (a free statistical software)</h2>
+<p>If you are sufficiently convinced that determining your own scores by rolling (as opposed to the “15, 14, 13, 12, 10, 8” shortcut), then you can use this function in R (if you already have it or download it for free).</p>
+<pre class="r"><code>Roll &lt;- ceiling(runif(min = 0, max = 6, n = 4)) #Rolls four six-sided dice
+Roll</code></pre>
+<pre><code>## [1] 1 3 2 3</code></pre>
+<pre class="r"><code>sum(Roll)- min(Roll) #calculates the sum keeping only the three highest valued dice</code></pre>
+<pre><code>## [1] 8</code></pre>
+<p>Note: you can also use the following free online R compiler <a href="https://www.jdoodle.com/execute-r-online">jdoodle</a>. Just copy and paste the three lines of code above and then click “Execute”.</p>
+</div>
+<div id="which-is-more-advantageous" class="section level2">
+<h2>Which is More Advantageous?</h2>
+<p>On an individual, ability score, basis it is hard to say. However, if we generalize a little bit we can come up with an answer rather nicely. Suppose we were interested in which technique (rolling our own dice vs 15, 14, 13, 12, 10, 8) produced the highest ability score, on average. Let X = sum(top three highest valued dice). Given the total ability score from the “15, 14, 13, 12, 10, 8” rule is 72 it suffices to calculate P(<span class="math inline">\(6X\ge72\)</span>). This will tell us if we are either more likely or less likely to roll better overall or not. And, as a result, which technique is more advantageous.</p>
+<p>P(<span class="math inline">\(6X\ge72\)</span>) = P(<span class="math inline">\(X\ge72/6\)</span>) = P(<span class="math inline">\(X\ge12\)</span>) = P(X=12) + P(X=13) + … + P(X=17) + P(X=18) = 0.62 (using the first table of probabilities)</p>
+<pre class="r"><code>#Keep probabilities for sums greater than or equal to 12
+relevant3 &lt;- sum3table[sum3table$Sum &gt; 11, ]
+sum(relevant3$Prob)</code></pre>
+<pre><code>## [1] 0.61591</code></pre>
+<p>So it appears that rolling is likely to produce a larger total of ability scores.</p>
+<p>Alternatively we could have looked at the expected value of the probability distribution regarding the sum of the three largest valued dice and compare that to 72/6 = 12.</p>
+<pre class="r"><code>Prod &lt;- sum3table$Sum * sum3table$Prob
+sum(Prod)</code></pre>
+<pre><code>## [1] 12.24235</code></pre>
+<p>Since the expected value for die rolling is greater than 12, on average we can expect to have a larger total ability score.</p>
+<p>&lt;(^_^)&gt;</p>
+</div>
